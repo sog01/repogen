@@ -86,7 +86,9 @@ func (gen *Generator) Generate() error {
 	gen.fileGens = append(gen.fileGens, repoHelperGen)
 
 	for _, file := range gen.fileGens {
-		writer, err := os.Create(gen.destination + "/" + file.destDir + "/" + file.name)
+		destDir := gen.destination + "/" + file.destDir
+		os.Mkdir(destDir, os.ModePerm)
+		writer, err := os.Create(destDir + "/" + file.name)
 		if err != nil {
 			return err
 		}
