@@ -26,6 +26,7 @@ func main() {
 	dbEnvPrefix := flag.String("envPrefix", "", "define envPrefix that append on creds information")
 	destination := flag.String("destination", "", "define destination")
 	modelPackage := flag.String("modelPackage", "", "define model package")
+	modelDir := flag.String("modelDir", "", "define model directory name")
 	repositoryPackage := flag.String("repositoryPackage", "", "define repository package")
 	ignoreError := flag.Bool("ignoreError", false, "ignore the error that occurs which probably happen in CI / CD")
 	flag.Parse()
@@ -38,6 +39,7 @@ func main() {
 		*dbEnvPrefix,
 		*destination,
 		*modelPackage,
+		*modelDir,
 		*repositoryPackage)
 	if err != nil && !*ignoreError {
 		log.Fatal(err)
@@ -52,6 +54,7 @@ func generate(module,
 	dbEnvPrefix,
 	destination,
 	modelPackage,
+	modelDir,
 	repositoryPackage string) error {
 	if len(tables) == 0 {
 		log.Fatal("empty tables")
@@ -85,6 +88,7 @@ func generate(module,
 	}
 	gen := generator.NewGenerator(db, module, destination, strings.Split(tables, ","))
 	gen.SetModelPackage(modelPackage)
+	gen.SetModelDir(modelDir)
 	gen.SetRepositoryPackage(repositoryPackage)
 	if err := gen.Generate(); err != nil {
 		return errors.New("unable to generate repository")

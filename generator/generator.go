@@ -24,6 +24,7 @@ type Generator struct {
 
 type generatorOpt struct {
 	modelPackage      string
+	modelDir          string
 	repositoryPackage string
 }
 
@@ -40,6 +41,7 @@ func NewGenerator(db *sqlx.DB, module, destination string, tables []string) *Gen
 		tables:      tables,
 		destination: destination,
 		opt: &generatorOpt{
+			modelDir:          "model",
 			modelPackage:      "model",
 			repositoryPackage: "repository",
 		},
@@ -49,6 +51,12 @@ func NewGenerator(db *sqlx.DB, module, destination string, tables []string) *Gen
 func (gen *Generator) SetModelPackage(modelPackage string) {
 	if modelPackage != "" {
 		gen.opt.modelPackage = modelPackage
+	}
+}
+
+func (gen *Generator) SetModelDir(modelDir string) {
+	if modelDir != "" {
+		gen.opt.modelDir = modelDir
 	}
 }
 
@@ -182,7 +190,7 @@ func (gen *Generator) genModel(obj *parser.Object) (*fileGen, error) {
 	return &fileGen{
 		name:    obj.Table + "_gen.go",
 		tmpl:    string(formatted),
-		destDir: gen.opt.modelPackage,
+		destDir: gen.opt.modelDir,
 	}, nil
 }
 
