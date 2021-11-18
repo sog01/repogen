@@ -108,6 +108,7 @@ func (gen *Generator) resolveModelPath(modelDest string) string {
 	}
 
 	dir := filepath.Dir(currentDir + "/" + gen.destination)
+	destinationDir := resolveDestinationDir(gen.destination)
 	splitted := strings.Split(dir, "/")
 	n := len(splitted)
 	var modelPath []string
@@ -116,22 +117,39 @@ func (gen *Generator) resolveModelPath(modelDest string) string {
 		splitted := strings.Split(gen.module, "/")
 		moduleDir := splitted[len(splitted)-1]
 		if dirParent == moduleDir {
+			modelPath = reverseModelPath(modelPath)
+			if destinationDir != "" {
+				modelPath = append(modelPath, destinationDir)
+			}
 			modelPath = append(modelPath, modelDest)
 			return strings.Join(modelPath, "/")
 		}
-		if len(modelPath) == 0 {
-			modelPath = append(modelPath, dirParent)
-		} else {
-			if len(modelPath[1:]) == 0 {
-				modelPath = append(modelPath, modelPath[0])
-			} else {
-				modelPath = append(modelPath[1:], modelPath[0:]...)
-			}
-			modelPath[0] = dirParent
-		}
+		modelPath = append(modelPath, dirParent)
 	}
 
 	return modelDest
+}
+
+func reverseModelPath(modelPath []string) []string {
+	var reversedModelPath []string
+	for i := len(modelPath) - 1; i >= 0; i-- {
+		reversedModelPath = append(reversedModelPath, modelPath[i])
+	}
+
+	return reversedModelPath
+}
+
+func resolveDestinationDir(destination string) string {
+	n := len(destination)
+	dir := destination
+	for i := n - 1; i >= 0; i-- {
+		if string(destination[i]) == "/" {
+			dir = destination[i+1:]
+			break
+		}
+	}
+
+	return dir
 }
 
 func (gen *Generator) genModel(obj *parser.Object) (*fileGen, error) {
