@@ -3,10 +3,10 @@ package template
 func (tp *TemplateParser) ParseRepoCommandTmpl() (string, error) {
 	return tp.execTmpl(`
 	type Repository{{.Name}}Command interface {
-		Insert{{.Name}}List(ctx context.Context, {{.PrivateName}}List {{.LowerName}}model.{{.Name}}List) (*InsertResult, error)
-		Insert{{.Name}}(ctx context.Context, {{.PrivateName}} *{{.LowerName}}model.{{.Name}}) (*InsertResult, error)
-		Update{{.Name}}ByFilter(ctx context.Context, {{.PrivateName}} *{{.LowerName}}model.{{.Name}}, filter Filter, updatedFields ...{{.Name}}Field) error
-		Update{{.Name}}(ctx context.Context, {{.PrivateName}} *{{.LowerName}}model.{{.Name}}, {{.IdName}} {{.IdType}}, updatedFields ...{{.Name}}Field) error
+		Insert{{.Name}}List(ctx context.Context, {{.PrivateName}}List {{.ModelPackage}}{{.Name}}List) (*InsertResult, error)
+		Insert{{.Name}}(ctx context.Context, {{.PrivateName}} *{{.ModelPackage}}{{.Name}}) (*InsertResult, error)
+		Update{{.Name}}ByFilter(ctx context.Context, {{.PrivateName}} *{{.ModelPackage}}{{.Name}}, filter Filter, updatedFields ...{{.Name}}Field) error
+		Update{{.Name}}(ctx context.Context, {{.PrivateName}} *{{.ModelPackage}}{{.Name}}, {{.IdName}} {{.IdType}}, updatedFields ...{{.Name}}Field) error
 		Delete{{.Name}}List(ctx context.Context, filter Filter) error
 		Delete{{.Name}}(ctx context.Context, {{.IdName}} {{.IdType}}) error
 	}
@@ -16,7 +16,7 @@ func (tp *TemplateParser) ParseRepoCommandTmpl() (string, error) {
 		tx   *sqlx.Tx
 	}
 
-	func(repo *Repository{{.Name}}CommandImpl) Insert{{.Name}}List(ctx context.Context, {{.PrivateName}}List {{.LowerName}}model.{{.Name}}List) (*InsertResult, error) {
+	func(repo *Repository{{.Name}}CommandImpl) Insert{{.Name}}List(ctx context.Context, {{.PrivateName}}List {{.ModelPackage}}{{.Name}}List) (*InsertResult, error) {
 		command := {{.Backtick}}INSERT INTO {{.Table}} ({{.DBFieldsSeperatedCommas}}) VALUES
 		{{.Backtick}}
 
@@ -41,11 +41,11 @@ func (tp *TemplateParser) ParseRepoCommandTmpl() (string, error) {
 		return &InsertResult{Result: sqlResult}, nil
 	}
 
-	func(repo *Repository{{.Name}}CommandImpl) Insert{{.Name}}(ctx context.Context, {{.PrivateName}} *{{.LowerName}}model.{{.Name}}) (*InsertResult, error) {
-		return repo.Insert{{.Name}}List(ctx, {{.LowerName}}model.{{.Name}}List{{.OpenBracket}}{{.PrivateName}}{{.CloseBracket}})
+	func(repo *Repository{{.Name}}CommandImpl) Insert{{.Name}}(ctx context.Context, {{.PrivateName}} *{{.ModelPackage}}{{.Name}}) (*InsertResult, error) {
+		return repo.Insert{{.Name}}List(ctx, {{.ModelPackage}}{{.Name}}List{{.OpenBracket}}{{.PrivateName}}{{.CloseBracket}})
 	}
 
-	func(repo *Repository{{.Name}}CommandImpl) Update{{.Name}}ByFilter(ctx context.Context, {{.PrivateName}} *{{.LowerName}}model.{{.Name}}, filter Filter, updatedFields ...{{.Name}}Field) error {
+	func(repo *Repository{{.Name}}CommandImpl) Update{{.Name}}ByFilter(ctx context.Context, {{.PrivateName}} *{{.ModelPackage}}{{.Name}}, filter Filter, updatedFields ...{{.Name}}Field) error {
 		updatedFieldQuery, values := buildUpdateFields{{.Name}}Query(updatedFields, {{.PrivateName}})
 		command := fmt.Sprintf({{.Backtick}}UPDATE {{.Table}} 
 			SET %s 
@@ -56,7 +56,7 @@ func (tp *TemplateParser) ParseRepoCommandTmpl() (string, error) {
 		return err
 	}
 
-	func(repo *Repository{{.Name}}CommandImpl) Update{{.Name}}(ctx context.Context, {{.PrivateName}} *{{.LowerName}}model.{{.Name}}, {{.IdName}} {{.IdType}}, updatedFields ...{{.Name}}Field) error {
+	func(repo *Repository{{.Name}}CommandImpl) Update{{.Name}}(ctx context.Context, {{.PrivateName}} *{{.ModelPackage}}{{.Name}}, {{.IdName}} {{.IdType}}, updatedFields ...{{.Name}}Field) error {
 		updatedFieldQuery, values := buildUpdateFields{{.Name}}Query(updatedFields, {{.PrivateName}})
 		command := fmt.Sprintf({{.Backtick}}UPDATE {{.Table}} 
 			SET %s 
@@ -109,7 +109,7 @@ func (tp *TemplateParser) ParseRepoCommandTmpl() (string, error) {
 		return stmt.ExecContext(ctx, args...)
 	}
 
-	func buildUpdateFields{{.Name}}Query(updatedFields {{.Name}}FieldList, {{.PrivateName}} *{{.LowerName}}model.{{.Name}}) ([]string, []interface{}) {
+	func buildUpdateFields{{.Name}}Query(updatedFields {{.Name}}FieldList, {{.PrivateName}} *{{.ModelPackage}}{{.Name}}) ([]string, []interface{}) {
 		var (
 			updatedFieldsQuery []string
 			args        []interface{}

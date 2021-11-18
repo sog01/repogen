@@ -8,7 +8,8 @@ import (
 )
 
 type TemplateParser struct {
-	Object *parser.Object
+	Object       *parser.Object
+	ModelPackage string
 }
 
 func (tp *TemplateParser) execTmpl(s string) (string, error) {
@@ -17,12 +18,14 @@ func (tp *TemplateParser) execTmpl(s string) (string, error) {
 		Backtick     string
 		OpenBracket  string
 		CloseBracket string
+		ModelPackage string
 	}
 
 	data.Object = tp.Object
 	data.Backtick = "`"
 	data.OpenBracket = "{"
 	data.CloseBracket = "}"
+	data.ModelPackage = tp.ModelPackage
 	return execTmpl(s, data)
 }
 

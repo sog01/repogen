@@ -213,23 +213,26 @@ func (gen *Generator) genRepo(obj *parser.Object, modelPath string) ([]*fileGen,
 
 func (gen *Generator) genRepoQuery(obj *parser.Object, modelPath string) (*fileGen, error) {
 	tmpl := template.TemplateParser{Object: obj}
-	repoTmpl, err := tmpl.ParseRepoQueryImpl()
-	if err != nil {
-		return nil, err
-	}
-
 	var importedPackages []*template.ImportedPackage
 	for _, imported := range repositoryQueryPackages {
 		importedPackages = append(importedPackages, &template.ImportedPackage{
 			Name: imported,
 		})
 	}
-
-	modelPackage := &template.ImportedPackage{
-		Name:  fmt.Sprintf("%s/%s", gen.module, modelPath),
-		Alias: obj.LowerName + "model",
+	if gen.opt.repositoryPackage != gen.opt.modelDir {
+		tmpl.ModelPackage = obj.LowerName + "model."
+		importedPackages = append(importedPackages, &template.ImportedPackage{
+			Name:  fmt.Sprintf("%s/%s", gen.module, modelPath),
+			Alias: obj.LowerName + "model",
+		})
 	}
-	importedTmpl, err := tmpl.ParsePackages(gen.opt.repositoryPackage, append(importedPackages, modelPackage))
+
+	repoTmpl, err := tmpl.ParseRepoQueryImpl()
+	if err != nil {
+		return nil, err
+	}
+
+	importedTmpl, err := tmpl.ParsePackages(gen.opt.repositoryPackage, importedPackages)
 	if err != nil {
 		return nil, err
 	}
@@ -251,23 +254,26 @@ func (gen *Generator) genRepoQuery(obj *parser.Object, modelPath string) (*fileG
 
 func (gen *Generator) genRepoCommand(obj *parser.Object, modelPath string) (*fileGen, error) {
 	tmpl := template.TemplateParser{Object: obj}
-	repoCommandTmpl, err := tmpl.ParseRepoCommandTmpl()
-	if err != nil {
-		return nil, err
-	}
-
 	var importedPackages []*template.ImportedPackage
 	for _, imported := range repositoryCommandPackages {
 		importedPackages = append(importedPackages, &template.ImportedPackage{
 			Name: imported,
 		})
 	}
-
-	modelPackage := &template.ImportedPackage{
-		Name:  fmt.Sprintf("%s/%s", gen.module, modelPath),
-		Alias: obj.LowerName + "model",
+	if gen.opt.repositoryPackage != gen.opt.modelDir {
+		tmpl.ModelPackage = obj.LowerName + "model."
+		importedPackages = append(importedPackages, &template.ImportedPackage{
+			Name:  fmt.Sprintf("%s/%s", gen.module, modelPath),
+			Alias: obj.LowerName + "model",
+		})
 	}
-	importedTmpl, err := tmpl.ParsePackages(gen.opt.repositoryPackage, append(importedPackages, modelPackage))
+
+	repoCommandTmpl, err := tmpl.ParseRepoCommandTmpl()
+	if err != nil {
+		return nil, err
+	}
+
+	importedTmpl, err := tmpl.ParsePackages(gen.opt.repositoryPackage, importedPackages)
 	if err != nil {
 		return nil, err
 	}

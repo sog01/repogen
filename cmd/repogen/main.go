@@ -91,7 +91,7 @@ func generate(module,
 	gen.SetModelDir(modelDir)
 	gen.SetRepositoryPackage(repositoryPackage)
 	if err := gen.Generate(); err != nil {
-		return errors.New("unable to generate repository")
+		return fmt.Errorf("unable to generate repository: %v", err)
 	}
 
 	return nil

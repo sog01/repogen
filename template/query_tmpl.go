@@ -9,8 +9,8 @@ func (tp *TemplateParser) ParseRepoQueryImpl() (string, error) {
 		Pagination{{.Name}}(pagination Pagination) Repository{{.Name}}Query
 		OrderBy{{.Name}}(orderBy []Order) Repository{{.Name}}Query
 		Get{{.Name}}Count(ctx context.Context) (int, error)
-		Get{{.Name}}(ctx context.Context)  (*{{.LowerName}}model.{{.Name}}, error)
-		Get{{.Name}}List(ctx context.Context)  ({{.LowerName}}model.{{.Name}}List, error)
+		Get{{.Name}}(ctx context.Context)  (*{{.ModelPackage}}{{.Name}}, error)
+		Get{{.Name}}List(ctx context.Context)  ({{.ModelPackage}}{{.Name}}List, error)
 	}
 
 	type Repository{{.Name}}QueryImpl struct {
@@ -80,9 +80,9 @@ func (tp *TemplateParser) ParseRepoQueryImpl() (string, error) {
 		}
 	}
 
-	func (repo *Repository{{.Name}}QueryImpl) Get{{.Name}}List(ctx context.Context)  ({{.LowerName}}model.{{.Name}}List, error) {
+	func (repo *Repository{{.Name}}QueryImpl) Get{{.Name}}List(ctx context.Context)  ({{.ModelPackage}}{{.Name}}List, error) {
 		var (
-			{{.PrivateName}}List {{.LowerName}}model.{{.Name}}List
+			{{.PrivateName}}List {{.ModelPackage}}{{.Name}}List
 			values []interface{}
 		)
 
@@ -129,7 +129,7 @@ func (tp *TemplateParser) ParseRepoQueryImpl() (string, error) {
 		return count, err
 	}
 
-	func (repo *Repository{{.Name}}QueryImpl) Get{{.Name}}(ctx context.Context)  (*{{.LowerName}}model.{{.Name}}, error) {
+	func (repo *Repository{{.Name}}QueryImpl) Get{{.Name}}(ctx context.Context)  (*{{.ModelPackage}}{{.Name}}, error) {
 		{{.PrivateName}}List, err := repo.Get{{.Name}}List(ctx)
 		if err != nil {
 			return nil, err
