@@ -32,6 +32,10 @@ func main() {
 	ignoreError := flag.Bool("ignoreError", false, "ignore the error that occurs which probably happen in CI / CD")
 	flag.Parse()
 
+	if *module == "" {
+		*module, _ = findModule()
+	}
+
 	err := generate(*module,
 		*tables,
 		*dbCreds,
@@ -99,6 +103,40 @@ func generate(module,
 	}
 
 	return nil
+}
+
+func findModule() (string, error) {
+	currDirPath, err := os.Getwd()
+	if err != nil {
+		return "", errors.New("unable to get working directory")
+	}
+
+	module, err := readModuleFromGoMod(currDirPath)
+	if err != nil {
+		return "", err
+	}
+
+	return module, nil
+}
+
+func readModuleFromGoMod(directory string) (string, error) {
+	gomodByt, err := os.ReadFile(directory + "/go.mod")
+	if os.IsNotExist(err) {
+		directory, err := filepath.Abs(directory + "/../")
+		if err != nil {
+			return "", err
+		}
+		return readModuleFromGoMod(directory)
+	}
+	if err != nil {
+		return "", err
+	}
+
+	gomod := string(gomodByt)
+	module := strings.TrimSpace(gomod[len("module"):])
+	moduleName := strings.Split(module, "\n")[0]
+
+	return moduleName, nil
 }
 
 func readCredsFromEnv(envPath, prefixenv string) (string, error) {
