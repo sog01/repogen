@@ -42,7 +42,6 @@ func NewGenerator(db *sqlx.DB, module, destination string, tables []string) *Gen
 		tables:      tables,
 		destination: destination,
 		opt: &generatorOpt{
-			modelDir:          "model",
 			modelPackage:      "model",
 			repositoryPackage: "repository",
 		},
@@ -174,10 +173,14 @@ func (gen *Generator) genModel(obj *parser.Object) (*fileGen, error) {
 		return nil, err
 	}
 
+	destDir := gen.opt.modelDir
+	if destDir == "" {
+		destDir = gen.opt.modelPackage
+	}
 	return &fileGen{
 		name:    obj.Table + "_gen.go",
 		tmpl:    string(formatted),
-		destDir: gen.opt.modelDir,
+		destDir: destDir,
 	}, nil
 }
 
