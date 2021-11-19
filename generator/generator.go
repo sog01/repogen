@@ -115,29 +115,24 @@ func (gen *Generator) Generate() error {
 }
 
 func (gen *Generator) resolveModelPath(modelDest string) string {
-	currentDir, err := os.Getwd()
+	destinationPath, err := filepath.Abs(gen.destination)
 	if err != nil {
 		return modelDest
 	}
 
-	dir := filepath.Dir(currentDir + "/" + gen.destination)
-	destinationDir := resolveDestinationDir(gen.destination)
-	splitted := strings.Split(dir, "/")
-	n := len(splitted)
+	splittedDestPath := strings.Split(destinationPath, "/")
+	n := len(splittedDestPath)
 	var modelPath []string
 	for i := n - 1; i > 0; i-- {
-		dirParent := splitted[i]
-		splitted := strings.Split(gen.module, "/")
-		moduleDir := splitted[len(splitted)-1]
-		if dirParent == moduleDir {
+		dirName := splittedDestPath[i]
+		splittedModule := strings.Split(gen.module, "/")
+		moduleDirName := splittedModule[len(splittedModule)-1]
+		if dirName == moduleDirName {
 			modelPath = reverseModelPath(modelPath)
-			if destinationDir != "" {
-				modelPath = append(modelPath, destinationDir)
-			}
 			modelPath = append(modelPath, modelDest)
 			return strings.Join(modelPath, "/")
 		}
-		modelPath = append(modelPath, dirParent)
+		modelPath = append(modelPath, dirName)
 	}
 
 	return modelDest
@@ -150,19 +145,6 @@ func reverseModelPath(modelPath []string) []string {
 	}
 
 	return reversedModelPath
-}
-
-func resolveDestinationDir(destination string) string {
-	n := len(destination)
-	dir := destination
-	for i := n - 1; i >= 0; i-- {
-		if string(destination[i]) == "/" {
-			dir = destination[i+1:]
-			break
-		}
-	}
-
-	return dir
 }
 
 func (gen *Generator) genModel(obj *parser.Object) (*fileGen, error) {
