@@ -35,6 +35,9 @@ func main() {
 	if *module == "" {
 		*module, _ = findModule()
 	}
+	if *dbEnvFile == "" {
+		*dbEnvFile = ".env"
+	}
 
 	err := generate(*module,
 		*tables,
