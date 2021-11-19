@@ -28,6 +28,7 @@ func main() {
 	modelPackage := flag.String("modelPackage", "", "define model package")
 	modelDir := flag.String("modelDir", "", "define model directory name")
 	repositoryPackage := flag.String("repositoryPackage", "", "define repository package")
+	queryOnly := flag.Bool("queryOnly", false, "only generate the repository only")
 	ignoreError := flag.Bool("ignoreError", false, "ignore the error that occurs which probably happen in CI / CD")
 	flag.Parse()
 
@@ -40,7 +41,8 @@ func main() {
 		*destination,
 		*modelPackage,
 		*modelDir,
-		*repositoryPackage)
+		*repositoryPackage,
+		*queryOnly)
 	if err != nil && !*ignoreError {
 		log.Fatal(err)
 	}
@@ -55,7 +57,8 @@ func generate(module,
 	destination,
 	modelPackage,
 	modelDir,
-	repositoryPackage string) error {
+	repositoryPackage string,
+	queryOnly bool) error {
 	if len(tables) == 0 {
 		log.Fatal("empty tables")
 	}
@@ -90,6 +93,7 @@ func generate(module,
 	gen.SetModelPackage(modelPackage)
 	gen.SetModelDir(modelDir)
 	gen.SetRepositoryPackage(repositoryPackage)
+	gen.SetQueryOnly(queryOnly)
 	if err := gen.Generate(); err != nil {
 		return fmt.Errorf("unable to generate repository: %v", err)
 	}

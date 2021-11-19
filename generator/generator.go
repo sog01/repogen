@@ -26,6 +26,7 @@ type generatorOpt struct {
 	modelPackage      string
 	modelDir          string
 	repositoryPackage string
+	queryOnly         bool
 }
 
 type fileGen struct {
@@ -64,6 +65,10 @@ func (gen *Generator) SetRepositoryPackage(repositoryPackage string) {
 	if repositoryPackage != "" {
 		gen.opt.repositoryPackage = repositoryPackage
 	}
+}
+
+func (gen *Generator) SetQueryOnly(queryOnly bool) {
+	gen.opt.queryOnly = queryOnly
 }
 
 func (gen *Generator) Generate() error {
@@ -198,6 +203,10 @@ func (gen *Generator) genRepo(obj *parser.Object, modelPath string) ([]*fileGen,
 	repoQueryTmpl, err := gen.genRepoQuery(obj, modelPath)
 	if err != nil {
 		return nil, err
+	}
+
+	if gen.opt.queryOnly {
+		return []*fileGen{repoQueryTmpl}, nil
 	}
 
 	repoCommandTmpl, err := gen.genRepoCommand(obj, modelPath)
