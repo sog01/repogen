@@ -25,7 +25,7 @@ func (tp *TemplateParser) ParseRepoCommandTmpl() (string, error) {
 			args   []interface{}
 		)
 		for _, {{.PrivateName}} := range {{.PrivateName}}List {
-			placeholders = append(placeholders, {{.Backtick}}{{.PlaceholdersSeparatedCommas}}{{.Backtick}})
+			placeholders = append(placeholders, {{.Backtick}}({{.PlaceholdersSeparatedCommas}}){{.Backtick}})
 			args = append(args, {{range .Fields}}{{if .AutoIncrement}}
 				{{else}}{{.ObjectPrivateName}}.{{.GoName}},
 				{{end}}{{end}}
