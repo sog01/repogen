@@ -258,11 +258,15 @@ var (
 	{{range .Fields}} func(f {{.ObjectName}}Filter) SetFilterBy{{.GoName}}(value interface{}, operator string) {{.ObjectName}}Filter {
 		query := "{{.DBField}} " + operator + " (?)"
 		var values []interface{}
-		switch strings.ToUpper(operator) {
-		case "IN", "NOT IN":
-			query, values, _ = sqlx.In(query, value)
-		default:
-			values = append(values, value)
+		if value == nil {
+			query = "{{.DBField}} " + operator
+		} else {
+			switch strings.ToUpper(operator) {
+			case "IN", "NOT IN":
+				query, values, _ = sqlx.In(query, value)
+			default:
+				values = append(values, value)
+			}
 		}
 		return {{.ObjectName}}Filter {
 			operator: f.operator,
