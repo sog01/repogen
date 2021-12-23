@@ -259,7 +259,7 @@ var (
 		query := "{{.DBField}} " + operator + " (?)"
 		var values []interface{}
 		switch strings.ToUpper(operator) {
-		case "IN":
+		case "IN", "NOT IN":
 			query, values, _ = sqlx.In(query, value)
 		default:
 			values = append(values, value)
