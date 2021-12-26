@@ -188,7 +188,7 @@ func findRootDirPath(module string) (string, error) {
 		return "", errors.New("unable to get working directory")
 	}
 
-	splittedCurrDir := strings.Split(currDirPath, "/")
+	splittedCurrDir := strings.Split(currDirPath, string(os.PathSeparator))
 	splittedModule := strings.Split(module, "/")
 	moduleDir := splittedModule[len(splittedModule)-1]
 	var rootDirPath []string
