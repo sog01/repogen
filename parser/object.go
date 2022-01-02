@@ -6,11 +6,13 @@ import (
 	"html/template"
 	"strings"
 
+	"github.com/gertd/go-pluralize"
 	"github.com/jmoiron/sqlx"
 )
 
 type ObjectParser struct {
-	db *sqlx.DB
+	db        *sqlx.DB
+	pluralize *pluralize.Client
 }
 
 type Object struct {
@@ -53,9 +55,10 @@ type columnDescribe struct {
 	Extra   sql.NullString `db:"Extra"`
 }
 
-func NewTableParser(db *sqlx.DB) *ObjectParser {
+func NewTableParser(db *sqlx.DB, pluralize *pluralize.Client) *ObjectParser {
 	return &ObjectParser{
-		db: db,
+		db:        db,
+		pluralize: pluralize,
 	}
 }
 
@@ -90,6 +93,10 @@ func (tp *ObjectParser) Parse(table string) (*Object, error) {
 		if column.Key.String == "PRI" {
 			obj.IdDBName = column.Field.String
 		}
+
+		// make the name as singular if the tables name is a plurar
+		obj.Name = tp.pluralize.Singular(obj.Name)
+		obj.PrivateName = tp.pluralize.Singular(obj.PrivateName)
 
 		autoIncrement := column.Extra.String == "auto_increment"
 		obj.Fields = append(obj.Fields, &Field{
