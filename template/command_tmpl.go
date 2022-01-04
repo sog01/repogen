@@ -106,7 +106,13 @@ func (tp *TemplateParser) ParseRepoCommandTmpl() (string, error) {
 			return nil, err
 		}
 	
-		return stmt.ExecContext(ctx, args...)
+		defer stmt.Close()
+		result, err := stmt.ExecContext(ctx, args...)
+		if err != nil {
+			return nil,err
+		}
+
+		return result, nil
 	}
 
 	func buildUpdateFields{{.Name}}Query(updatedFields {{.Name}}FieldList, {{.PrivateName}} *{{.ModelPackage}}{{.Name}}) ([]string, []interface{}) {
