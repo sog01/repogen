@@ -36,9 +36,9 @@ type fileGen struct {
 	destDir string
 }
 
-func NewGenerator(db *sqlx.DB, plurarize *pluralize.Client, module, destination string, tables []string) *Generator {
+func NewGenerator(db *sqlx.DB, pluralize *pluralize.Client, module, destination string, tables []string) *Generator {
 	return &Generator{
-		objParser:   parser.NewTableParser(db, plurarize),
+		objParser:   parser.NewTableParser(db, pluralize),
 		module:      module,
 		tables:      tables,
 		destination: destination,
