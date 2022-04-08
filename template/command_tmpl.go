@@ -17,8 +17,9 @@ func (tp *TemplateParser) ParseRepoCommandTmpl() (string, error) {
 	}
 
 	func(repo *Repository{{.Name}}CommandImpl) Insert{{.Name}}List(ctx context.Context, {{.PrivateName}}List {{.ModelPackage}}{{.Name}}List) (*InsertResult, error) {
-		command := {{.Backtick}}INSERT INTO {{.Table}} ({{.DBFieldsSeperatedCommas}}) VALUES
-		{{.Backtick}}
+		table := "{{.Backtick}}{{.Table}}{{.Backtick}}"
+		command := fmt.Sprintf({{.Backtick}}INSERT INTO %s ({{.DBFieldsSeperatedCommas}}) VALUES
+		{{.Backtick}}, table)
 
 		var (
 			placeholders []string
@@ -46,11 +47,12 @@ func (tp *TemplateParser) ParseRepoCommandTmpl() (string, error) {
 	}
 
 	func(repo *Repository{{.Name}}CommandImpl) Update{{.Name}}ByFilter(ctx context.Context, {{.PrivateName}} *{{.ModelPackage}}{{.Name}}, filter Filter, updatedFields ...{{.Name}}Field) error {
+		table := "{{.Backtick}}{{.Table}}{{.Backtick}}"
 		updatedFieldQuery, values := buildUpdateFields{{.Name}}Query(updatedFields, {{.PrivateName}})
-		command := fmt.Sprintf({{.Backtick}}UPDATE {{.Table}} 
+		command := fmt.Sprintf({{.Backtick}}UPDATE %s 
 			SET %s 
 		WHERE %s
-		{{.Backtick}}, strings.Join(updatedFieldQuery, ","), filter.Query())
+		{{.Backtick}}, table, strings.Join(updatedFieldQuery, ","), filter.Query())
 		values = append(values, filter.Values()...)
 		_, err := repo.exec(ctx, command, values)
 		return err
@@ -58,23 +60,24 @@ func (tp *TemplateParser) ParseRepoCommandTmpl() (string, error) {
 
 	func(repo *Repository{{.Name}}CommandImpl) Update{{.Name}}(ctx context.Context, {{.PrivateName}} *{{.ModelPackage}}{{.Name}}, {{.IdName}} {{.IdType}}, updatedFields ...{{.Name}}Field) error {
 		updatedFieldQuery, values := buildUpdateFields{{.Name}}Query(updatedFields, {{.PrivateName}})
-		command := fmt.Sprintf({{.Backtick}}UPDATE {{.Table}} 
+		table := "{{.Backtick}}{{.Table}}{{.Backtick}}"
+		command := fmt.Sprintf({{.Backtick}}UPDATE %s 
 			SET %s 
 		WHERE {{.IdDBName}} = ?
-		{{.Backtick}}, strings.Join(updatedFieldQuery, ","))
+		{{.Backtick}}, table, strings.Join(updatedFieldQuery, ","))
 		values = append(values, {{.IdName}})
 		_, err := repo.exec(ctx, command, values)
 		return err
 	}
 
 	func(repo *Repository{{.Name}}CommandImpl) Delete{{.Name}}List(ctx context.Context, filter Filter) error {
-		command := "DELETE FROM {{.Table}} WHERE "+filter.Query()
+		command := "DELETE FROM {{.Backtick}}{{.Table}}{{.Backtick}} WHERE "+filter.Query()
 		_, err := repo.exec(ctx, command, filter.Values())
 		return err
 	}
 
 	func(repo *Repository{{.Name}}CommandImpl) Delete{{.Name}}(ctx context.Context, {{.IdName}} {{.IdType}}) error {
-		command := "DELETE FROM {{.Table}} WHERE {{.IdDBName}} = ?"
+		command := "DELETE FROM {{.Backtick}}{{.Table}}{{.Backtick}} WHERE {{.IdDBName}} = ?"
 		_, err := repo.exec(ctx, command, []interface{{.OpenBracket}}{{.CloseBracket}}{{.OpenBracket}}{{.IdName}}{{.CloseBracket}})
 		return err
 	}
