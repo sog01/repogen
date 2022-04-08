@@ -90,7 +90,7 @@ func (tp *TemplateParser) ParseRepoQueryImpl() (string, error) {
 			repo.fields = {{.Name}}SelectFields{}.All()
 		}
 
-		query := fmt.Sprintf("SELECT %s FROM {{.Table}}", strings.Join(repo.fields.toString(), ","))
+		query := fmt.Sprintf("SELECT %s FROM {{.Backtick}}{{.Table}}{{.Backtick}}", strings.Join(repo.fields.toString(), ","))
 		if repo.filter != nil {
 			query += " WHERE "+repo.filter.Query()
 			values = append(values, repo.filter.Values()...)
@@ -118,7 +118,7 @@ func (tp *TemplateParser) ParseRepoQueryImpl() (string, error) {
 
 	func (repo *Repository{{.Name}}QueryImpl) Get{{.Name}}Count(ctx context.Context) (int, error) {
 		var values []interface{}
-		query := fmt.Sprintf("SELECT count(1) FROM {{.Table}}")
+		query := fmt.Sprintf("SELECT count(1) FROM {{.Backtick}}{{.Table}}{{.Backtick}}")
 		if repo.filter != nil {
 			query += " WHERE "+repo.filter.Query()
 			values = append(values, repo.filter.Values()...)
