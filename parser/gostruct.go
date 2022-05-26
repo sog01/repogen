@@ -133,12 +133,12 @@ func snakeToCamel(s string) string {
 func resolveImportedPkg(goFields []*GoField) []string {
 	importedMap := make(map[string]struct{})
 	for _, field := range goFields {
-		if strings.Contains(strings.ToLower(string(field.Type)), "null") {
+		if strings.Contains(strings.ToLower(string(field.Type)), "decimal") {
+			importedMap["github.com/shopspring/decimal"] = struct{}{}
+		} else if strings.Contains(strings.ToLower(string(field.Type)), "null") {
 			importedMap["github.com/guregu/null"] = struct{}{}
 		} else if strings.Contains(strings.ToLower(string(field.Type)), "time") {
 			importedMap["time"] = struct{}{}
-		} else if strings.Contains(strings.ToLower(string(field.Type)), "decimal") {
-			importedMap["github.com/shopspring/decimal"] = struct{}{}
 		}
 	}
 
