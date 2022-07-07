@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/gertd/go-pluralize"
 	"github.com/sog01/repogen/generator"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -91,12 +92,13 @@ func generate(module,
 			return err
 		}
 	}
-
 	db, err := sqlx.Open("mysql", creds)
 	if err != nil {
 		return errors.New("unable to connect to db")
 	}
-	gen := generator.NewGenerator(db, module, destination, strings.Split(tables, ","))
+
+	pluralize := pluralize.NewClient()
+	gen := generator.NewGenerator(db, pluralize, module, destination, strings.Split(tables, ","))
 	gen.SetModelPackage(modelPackage)
 	gen.SetModelDir(modelDir)
 	gen.SetRepositoryPackage(repositoryPackage)
