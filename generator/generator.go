@@ -119,7 +119,7 @@ func (gen *Generator) resolveModelPath(modelDest string) string {
 		return modelDest
 	}
 
-	splittedDestPath := strings.Split(destinationPath, "/")
+	splittedDestPath := strings.Split(destinationPath, string(os.PathSeparator))
 	n := len(splittedDestPath)
 	var modelPath []string
 	for i := n - 1; i > 0; i-- {
