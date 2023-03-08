@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 )
@@ -54,7 +53,9 @@ func (goResolver *GoResolver) ResolveField(c *columnDescribe) (*GoField, bool, e
 	goNullType, goNullTypeSel := goResolver.resolveNullType(c.Type.String)
 	if goType == "unknown" ||
 		goNullType == "unknown" {
-		return nil, false, errors.New("unknown type")
+		return nil, false, fmt.Errorf("unknown '%s' nullable '%v' type",
+			c.Type.String,
+			nullable)
 	}
 
 	goField := &GoField{
@@ -81,7 +82,7 @@ func (goResolver *GoResolver) ResolveType(s string, nullable bool) string {
 		return "int64"
 	case "int":
 		return "int32"
-	case "text", "varchar", "enum", "char":
+	case "text", "varchar", "enum", "char", "longtext":
 		return "string"
 	case "float":
 		return "float64"
@@ -100,7 +101,7 @@ func (goResolver *GoResolver) resolveNullType(s string) (string, string) {
 	switch sanitizeTableType(strings.ToLower(s)) {
 	case "bigint", "int", "tinyint":
 		return "null.Int", "Int64"
-	case "text", "varchar", "enum", "char":
+	case "text", "varchar", "enum", "char", "longtext":
 		return "null.String", "String"
 	case "float":
 		return "null.Float", "Float64"
