@@ -82,7 +82,7 @@ func (goResolver *GoResolver) ResolveType(s string, nullable bool) string {
 		return "int64"
 	case "int":
 		return "int32"
-	case "text", "varchar", "enum", "char", "longtext":
+	case "text", "varchar", "enum", "char", "longtext", "mediumblob":
 		return "string"
 	case "float":
 		return "float64"
@@ -101,7 +101,7 @@ func (goResolver *GoResolver) resolveNullType(s string) (string, string) {
 	switch sanitizeTableType(strings.ToLower(s)) {
 	case "bigint", "int", "tinyint":
 		return "null.Int", "Int64"
-	case "text", "varchar", "enum", "char", "longtext":
+	case "text", "varchar", "enum", "char", "longtext", "mediumblob":
 		return "null.String", "String"
 	case "float":
 		return "null.Float", "Float64"
