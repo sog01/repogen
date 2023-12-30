@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/gertd/go-pluralize"
 	"github.com/sog01/repogen/parser"
 	"github.com/sog01/repogen/template"
 
@@ -35,9 +36,9 @@ type fileGen struct {
 	destDir string
 }
 
-func NewGenerator(db *sqlx.DB, module, destination string, tables []string) *Generator {
+func NewGenerator(db *sqlx.DB, pluralize *pluralize.Client, module, destination string, tables []string) *Generator {
 	return &Generator{
-		objParser:   parser.NewTableParser(db),
+		objParser:   parser.NewTableParser(db, pluralize),
 		module:      module,
 		tables:      tables,
 		destination: destination,
